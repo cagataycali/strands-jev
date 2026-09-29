@@ -59,6 +59,7 @@ format = "ruff format src tests examples"
 format-check = "ruff format --check src tests examples"
 typecheck = "mypy src"
 prepare = ["format", "lint", "typecheck", "test"]
+docs = "mkdocs build --strict {args}"
 
 [tool.ruff]
 line-length = 120

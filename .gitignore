@@ -11,3 +11,7 @@ build/
 *.key
 .typesafe
 tests/live/raw/
+
+# docs build
+.venv-docs/
+site/

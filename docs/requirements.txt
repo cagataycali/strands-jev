@@ -1,0 +1,5 @@
+# Build dependencies for the docs site (mkdocs build --strict). The package itself is
+# installed alongside (pip install -e .) because the Tools reference is generated from the
+# @tool specs at build time.
+mkdocs>=1.6.1,<2.0
+mkdocs-material>=9.7.7,<10.0

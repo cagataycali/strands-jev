@@ -1,0 +1,43 @@
+{% set install = 'pip install git+https://github.com/cagataycali/strands-jev' %}
+{% set columns = [
+  ("Start", [("Install", "start/install/"), ("First decision", "start/first-decision/"), ("First agent", "start/first-agent/"), ("What it costs", "start/cost/")]),
+  ("Learn", [("System One", "learn/system-one/"), ("Primitives", "learn/primitives/"), ("State", "learn/state/"), ("Confidence", "learn/confidence/"), ("Patterns", "learn/patterns/"), ("What not to ask", "learn/what-not-to-ask/")]),
+  ("Tools", [("All tools", "tools/"), ("Primitives", "tools/primitives/"), ("Patterns", "tools/patterns/"), ("Cookbooks", "tools/cookbooks/")]),
+  ("Measured", [("Results", "measured/"), ("Method", "measured/method/"), ("Cost", "measured/cost/")]),
+  ("Project", [("Design", "project/design/"), ("Keys and data", "project/keys-and-data/"), ("Changelog", "project/changelog/"), ("Contributing", "project/contributing/"), ("GitHub", config.repo_url)]),
+] %}
+<div class="sj-cta"><div class="sj-cta__panel">
+  <p class="sj-cta__title">A chat model proposes. Jev decides.</p>
+  <p class="sj-cta__links">
+    <a href="{{ 'start/' | url }}">Start &rarr;</a>
+    <a href="{{ 'tools/' | url }}">The tools &rarr;</a>
+    <a href="{{ 'measured/' | url }}">Measured &rarr;</a>
+  </p>
+</div></div>
+<footer class="md-footer sj-footer">
+  <div class="sj-footer__inner md-grid">
+    <p class="sj-footer__kicker">Start building in seconds</p>
+    <p class="sj-install sj-install--footer">{{ install }}<button class="sj-copy" type="button" data-clipboard-text="{{ install | e }}">copy</button></p>
+    <div class="sj-footer__columns">
+      {% for title, links in columns %}
+        <div>
+          <p class="sj-footer__heading">{{ title }}</p>
+          <ul>
+            {% for label, href in links %}
+              <li><a href="{{ href if href.startswith('http') else href | url }}">{{ label }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="sj-footmark" aria-hidden="true">{% include "partials/wordmark.svg" %}</div>
+  <div class="sj-footer__legal md-grid">
+    <span class="sj-aws" aria-label="AWS">{% include "partials/aws.svg" %}</span>
+    <a href="https://aws.amazon.com/privacy/">Privacy</a>
+    <a href="https://aws.amazon.com/terms/">Site terms</a>
+    <a href="{{ config.repo_url }}/blob/main/LICENSE">License</a>
+    <a href="https://aws.amazon.com/legal/cookies/">Cookies</a>
+  </div>
+  <p class="sj-footer__copyright md-grid">&copy; {{ build_date_utc.year }}, Amazon Web Services, Inc. or its affiliates. All rights reserved.</p>
+</footer>

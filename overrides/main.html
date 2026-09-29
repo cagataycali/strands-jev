@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ page.title if page.title else config.site_name }} | Strands Jev">
+  <meta property="og:description" content="{{ config.site_description }}">
+  {% endblock %}
+
+{% block content %}
+  {% if page.meta and page.meta.template_class %}
+    <div class="{{ page.meta.template_class }}">{{ super() }}</div>
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
