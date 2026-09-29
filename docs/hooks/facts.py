@@ -76,15 +76,18 @@ def _constants(path: Path) -> dict[str, Any]:
     return out
 
 
-def _list_length(path: Path, name: str) -> int | None:
-    """Length of a module-level list literal ``name = [a, b, ...]``, or None when absent."""
-    if not path.exists():
-        return None
-    for node in ast.parse(path.read_text(encoding="utf-8")).body:
-        if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == name for t in node.targets):
-            if isinstance(node.value, ast.List | ast.Tuple):
-                return len(node.value.elts)
-    return None
+def _group_size(group: str, name: str) -> int | None:
+    """Tools in a group: the lengths of ``NAME`` and ``NAME_<n>`` list literals across the
+    group's modules (``cookbooks.py``, ``cookbooks_more.py``, ...), or None when none exists."""
+    total: int | None = None
+    for path in sorted((_SRC / "tools").glob(f"{group}*.py")):
+        for node in ast.parse(path.read_text(encoding="utf-8")).body:
+            if not isinstance(node, ast.Assign) or not isinstance(node.value, ast.List | ast.Tuple):
+                continue
+            for target in node.targets:
+                if isinstance(target, ast.Name) and re.fullmatch(rf"{name}(_\d+)?", target.id):
+                    total = (total or 0) + len(node.value.elts)
+    return total
 
 
 def _count_tests(paths: list[Path]) -> int:
@@ -147,7 +150,7 @@ def numbers() -> dict[str, Any]:
     out["tools"] = tools
     groups = 0
     for group, list_name in _GROUPS:
-        n = _list_length(_SRC / "tools" / f"{group}.py", list_name)
+        n = _group_size(group, list_name)
         out[f"tools_{group}"] = n or 0
         groups += 1 if n else 0
     out["groups"] = groups

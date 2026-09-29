@@ -12,7 +12,8 @@ Two tokens, each on a line of its own:
 
 The source of truth is ``strands_jev.tools``: the module is imported and every tool's
 ``tool_spec`` is read, so what the site shows is what the model is handed. Group membership
-comes from the ``PRIMITIVE_TOOLS`` / ``PATTERN_TOOLS`` / ``COOKBOOK_TOOLS`` lists; the ported
+comes from the ``PRIMITIVE_TOOLS`` / ``PATTERN_TOOLS`` / ``COOKBOOK_TOOLS`` lists (a
+continuation list such as ``COOKBOOK_TOOLS_2`` joins its group); the ported
 page from a ``PORTS`` mapping when the package exposes one, else from the first
 ``docs.typesafe.ai/...`` reference in the docstring. ``python docs/hooks/tools_ref.py``
 prints the markdown for a look.
@@ -116,7 +117,11 @@ def catalogue() -> dict[str, list[dict[str, Any]]]:
     out: dict[str, list[dict[str, Any]]] = {}
     for group, attr in _GROUPS.items():
         entries: list[dict[str, Any]] = []
-        for tool in getattr(tools, attr, []) or []:
+        members: list[Any] = []
+        for name in sorted(dir(tools)):
+            if name == attr or (name.startswith(attr + "_") and name[len(attr) + 1 :].isdigit()):
+                members.extend(getattr(tools, name) or [])
+        for tool in members:
             spec = tool.tool_spec
             schema = spec["inputSchema"]["json"]
             required = set(schema.get("required", []))
