@@ -49,8 +49,12 @@ result = agent.tool.jev_ask(
 | `jev_ask` | The raw call: one state, any mix of noul, choice and score questions, one request. |
 | `jev_models` | The model ids the endpoint serves. |
 | `jev_usage` | Calls, tokens, latency and computed cost so far. |
+| `fan_out` | Every question in one request, speculative ones tied to a premise; applicable answers kept, the rest reported as skipped. |
+| `route` | Intent Choice plus complexity Score; confidence floor, per-intent thresholds, a person as the default handler. |
+| `composite_score` | Atomic Score per dimension, normalised, combined under weight profiles in code; ranks items. |
+| `function_call` | Request to function name plus closed-set arguments with per-argument confidence and a no-match outcome. |
 
-More groups (patterns, cookbooks) are on the way; see `docs/DESIGN.md`.
+Cookbook tools are next; see `docs/DESIGN.md` for the grid.
 
 ## Measured
 
@@ -59,6 +63,10 @@ From `tests/live/RESULTS.md`, 2026-09-29, jev-1.13.0:
 | tool | Jev | baseline | mean latency | cost |
 | --- | --- | --- | --- | --- |
 | `jev_ask`, 8 tickets x 3 questions | 7/8 | 5/8 (keyword rules) | 179 ms | $0.000148 for 8 calls |
+| `fan_out`, 12 tickets x 4 questions | 10/12 | 8/12 (keyword rules) | 159 ms | $0.000231 for 12 calls |
+| `route`, 14 messages | 14/14 | 11/14 (keyword rules) | 179 ms | $0.000289 for 14 calls |
+| `composite_score`, 30 resume pairs | 27/30 | 20/30 (keyword counts) | 213 ms | $0.000139 for 6 calls |
+| `function_call`, 16 commands | 14/16 | 10/16 (keyword dispatch) | 172 ms | $0.001253 for 16 calls |
 
 ## What not to ask
 

@@ -84,7 +84,7 @@ async def test_ask_refuses_bad_specs_before_spending(fake: FakeJev) -> None:
         ),
         ("{not json", "does not parse"),
         ([], "empty"),
-        ({f"q{i}": "x" for i in range(65)}, "over the ceiling of 64"),
+        ({f"q{i}": "x" for i in range(129)}, "over the ceiling of 128"),
     ]
     for questions, message in cases:
         result = await jev_ask(state="x", questions=questions, tool_context=_ctx(fake))

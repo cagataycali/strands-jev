@@ -34,9 +34,10 @@ CHARS_PER_TOKEN = 4
 PRICE_PER_MILLION_INPUT_TOKENS = 0.042
 """USD. Output tokens are free (docs.typesafe.ai/models, 2026-09-29)."""
 
-MAX_QUESTIONS_PER_REQUEST = 64
+MAX_QUESTIONS_PER_REQUEST = 128
 """Ceiling this package puts on one fan-out. The API has no documented count limit; the token
-limits above are the real bound. 64 keeps a mistaken loop from sending a thousand."""
+limits above are the real bound. The function-calling cookbook sends 54 questions per command
+(docs.typesafe.ai/cookbooks/function_calling); 128 leaves room and stops a runaway loop."""
 
 MAX_ITEMS_PER_BATCH = 500
 """Most items a many-item tool will judge in one call. A ceiling on the bill."""
@@ -59,9 +60,38 @@ DEFAULT_NOUL_THRESHOLD = 0.5
 DEFAULT_UNCERTAIN_MARGIN = 0.15
 """Half-width of the band around a Noul threshold reported as uncertain instead of decided."""
 
+DEFAULT_COMPLEXITY_ESCALATE_ABOVE = 1.0
+"""Intent routing: a complexity score above this goes to a person (pattern used 1)."""
+
+DEFAULT_COMPLEXITY_CONFIDENCE_FLOOR = 0.5
+"""Intent routing: below this confidence on complexity, escalate (pattern used 0.5)."""
+
 # --------------------------------------------------------------------------- questions
 # Question text for tools that own a fixed question. Tools whose questions come from the
-# caller (jev_ask, fan_out, route) have nothing here by design.
+# caller (jev_ask, fan_out) have nothing here by design.
 
-PRESENCE_ABSENT = "not stated"
-"""The option every closed-set question adds so the model can say nothing fits."""
+NO_MATCH = "none_of_these"
+"""The option closed-set questions add so the model can say nothing fits."""
+
+NO_MATCH_DESCRIPTION = "None of the listed options applies"
+
+ROUTE_INTENT = "Which of these best describes what the message is asking for?"
+
+ROUTE_COMPLEXITY = "How much judgement does resolving this request take?"
+ROUTE_COMPLEXITY_LEVELS = [
+    "A lookup or a fixed procedure answers it completely",
+    "It needs some judgement or context but follows a known playbook",
+    "It needs a person: an exception, a dispute, a policy call, or an angry customer",
+]
+
+FUNCTION_CHOICE = "What is the user asking to do? Pick the function that does it."
+
+COMPOSITE_LEVELS = [
+    "No evidence of this at all",
+    "A mention or a hint, nothing substantial",
+    "Some real evidence, at a basic level",
+    "Strong evidence, clearly demonstrated",
+    "Exceptional, among the strongest one would see",
+]
+"""Default rubric for composite_score dimensions when the caller gives none. Five levels,
+index 0 first, normalised to 0..1 by dividing by 4 (composite-scoring pattern)."""

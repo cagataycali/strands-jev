@@ -30,14 +30,27 @@ agent as intervention handlers. Here the agent is in front: it decides to ask.
 | jev_ask | primitives | api, primitives, primitives/noul, primitives/choice, primitives/score, primitives#advanced-structure | dict specs instead of SDK objects; a bare string is a noul; a list is named q1..qN |
 | jev_models | primitives | models | returns the raw rows |
 | jev_usage | primitives | models (price) | cost computed, the API reports tokens only |
-
-The rest of the grid is filled in as each group lands.
+| fan_out | patterns | patterns/fan-out | premises are explicit data (`equals`, `at_least`), skipped answers are returned, not dropped |
+| route | patterns | patterns/intent-routing, patterns/confidence-routing | one tool: intent Choice + complexity Score, per-intent thresholds, `complex_intents` names where the complexity gate applies, `none_of_these` added |
+| composite_score | patterns | patterns/composite-scoring | weight profiles validated in code, raw normalised scores returned, `items` ranks many with one request each |
+| function_call | patterns | cookbooks/function_calling | the spec is the tool input (no signature reflection), `none_of_these` on the function Choice, confidence is the minimum judgement as in the cookbook |
 
 ## Folded and rejected
 
-To be written as the groups land.
+- confidence-gated routing is folded into `route` as `thresholds` (per-intent floors). A
+  separate tool would have been `route` with one intent.
+- `route` gates complexity only on `complex_intents`. Measured 2026-09-29: gating every
+  intent escalated two clear lookups because a 3-level Score's confidence sat at 0.42 and
+  0.43, under the pattern's 0.5 floor. The pattern itself gates only complaints.
+- `function_call` does not read Python signatures the way the cookbook's `closed_sets`
+  does. The agent hands over a catalogue; a signature reader is one function on top and
+  would tie the tool to Python callables.
 
 ## Open questions
 
+- `function_call` on "show me apple daily with volume" returned `plot_price` with all three
+  arguments in one run and `none_of_these` at 0.45 in the next. The function Choice sits
+  near the boundary for that command; a `stated` question on the whole request or a second
+  request over the top two functions might settle it. Not done yet.
 - The docs' Limits section gives token limits, not a question count. `MAX_QUESTIONS_PER_REQUEST`
   is 64 here as a guard on the bill, not a documented ceiling.
