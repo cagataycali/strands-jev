@@ -59,8 +59,14 @@ result = agent.tool.jev_ask(
 | `extract_date` | Seven Choices read the shape and parts of a date; code assembles it and reports the weakest confidence. |
 | `verify_citations` | Missing quotes fail by string match; present ones get supports, contradicts or says nothing. |
 | `count_matching` | One Noul per item, the count done in code, because Jev does not count. |
+| `align_entities` | Same, related or different for record pairs: a 3-level Score plus a Noul per field saying where they disagree. |
+| `classify_hierarchical` | One Choice per taxonomy level, descending while confident, with none_of_these at every level. |
+| `recover_structure` | Flattened text back to Markdown: stitch torn lines, then type each block (heading, step, quote, code, callout). |
+| `guardrail` | The cookbook's hazard batteries (input or output) plus a severity Score; your policy decides. |
+| `pick_from_catalog` | Rank a catalogue of up to 255 entries in one request, re-check the top k in a second, pick one or none. |
+| `consistency_check` | Ask, optionally repeat, report agreement, and route anything near a threshold to review. |
 
-Second shelf of cookbook tools (entity alignment, hierarchical classification, structure recovery, guardrails, catalogue picking, consistency checks) is in progress; see `docs/DESIGN.md`.
+`docs/DESIGN.md` maps every tool to the docs page it ports and says what was folded or left out.
 
 ## Measured
 
@@ -79,8 +85,14 @@ From `tests/live/RESULTS.md`, 2026-09-29, jev-1.13.0:
 | `extract_date`, 8 documents | 8/8 | 5/8 (regex) | 144 ms | $0.000562 for 8 calls |
 | `verify_citations`, 10 citations | 8/10 | 5/10 (string match) | 216 ms | $0.000182 for 9 calls |
 | `count_matching`, 12 log lines | 11/12 | 9/12 (grep) | 184 ms | $0.000160 for 12 calls |
+| `align_entities`, 8 record pairs | 8/8 | 5/8 (name overlap) | 233 ms | $0.000165 for 8 calls |
+| `classify_hierarchical`, 12 tickets | 11/12 | 8/12 (keyword paths) | 158 ms | $0.000342 for 22 calls |
+| `recover_structure`, 11 blocks | 10/11 | 0/11 (punctuation rules) | 157 ms | $0.000293 for 2 calls |
+| `guardrail`, 10 messages | 10/10 | 9/10 (keyword filter) | 152 ms | $0.000269 for 10 calls |
+| `pick_from_catalog`, 8 requests | 7/8 | 3/8 (token overlap) | 160 ms | $0.000436 for 16 calls |
+| `consistency_check`, 3 questions x 3 | 3/3 | 2/3 (keywords) | 244 ms | $0.000048 for 3 calls |
 
-Everything above cost $0.0041 in total, 149 calls.
+Everything above cost $0.0057 in total over 213 calls. Every tool beat the code a developer would write without a model, on case sets written so that code could not ace them.
 
 ## What not to ask
 

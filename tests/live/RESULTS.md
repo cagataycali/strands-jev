@@ -27,6 +27,12 @@ The two sections below were run in two sessions of the same suite on the same da
 | extract_date | 8 documents, 7 Choices each | 8/8 | 5/8 | 8 | 13,381 | 0.000562 | 144 |
 | verify_citations | 10 citations over 2 sources | 8/10 | 5/10 | 9 | 4,343 | 0.000182 | 216 |
 | count_matching | 12 log lines | 11/12 | 9/12 | 12 | 3,814 | 0.000160 | 184 |
+| align_entities | 8 beer pairs | 8/8 | 5/8 | 8 | 3,936 | 0.000165 | 233 |
+| classify_hierarchical | 12 tickets, 3 roots, full path | 11/12 | 8/12 | 22 | 8,134 | 0.000342 | 158 |
+| recover_structure | 11 blocks from 13 flattened lines | 10/11 | 0/11 | 2 | 6,984 | 0.000293 | 157 |
+| guardrail | 10 messages, pass or not | 10/10 | 9/10 | 10 | 6,411 | 0.000269 | 152 |
+| pick_from_catalog | 8 requests over 10 entries | 7/8 | 3/8 | 16 | 10,378 | 0.000436 | 160 |
+| consistency_check | 3 questions x 3 repeats | 3/3 | 2/3 | 3 | 1,131 | 0.000048 | 244 |
 
 jev_ask: each message carries a noul (urgency), a choice (billing, technical, sales) and a
 3-level score (frustration); a case counts only when all three match the label. The
@@ -102,4 +108,43 @@ re-established after 4 s" (labelled as something having gone wrong) read as rout
 INFO level. The grep baseline flagged a DEBUG line about error budget and a release note
 containing the word failure.
 
-Total spend this table: $0.004125 over 149 calls, 98,218 input tokens.
+align_entities: the cookbook's three levels (different, closely related, the same) as a
+Score plus same-name, same-brewery and same-style Nouls, one request per pair. All eight
+pairs landed on the labelled outcome, including "Pliny the Elder" against "Pliny the
+Younger" (review) and "Westvleteren 12" against "St. Bernardus Abt 12" (different beers,
+same style). Name-token overlap called the Sierra Nevada pair review and the Duvel pair
+same.
+
+classify_hierarchical: three roots with two or three children each, one Choice per level.
+The miss: "since upgrading to the new release the fan runs constantly at the login screen"
+stopped at the top level with confidence 0.34 split between hardware and software, which
+is a fair reading of an ambiguous ticket. Four cases were written without any of the
+keyword baseline's words ("the thing I type on", "my card was hit twice"); Jev classified
+all four to the leaf.
+
+recover_structure: 13 flattened lines with three torn sentences, three headings, three
+procedure steps, a warning, a quote and a shell command. Two requests (16 join questions,
+then 43 block questions). Every torn line was stitched back; the one miss typed "make sure
+the machine has at least 2 GB of free memory" as a list item rather than a paragraph, and
+rendered it as a one-item bullet. The three steps came out as an ordered list (mean step
+probability over 0.5). The punctuation heuristic baseline matched zero blocks because it
+joined lines wrongly from the first heading on.
+
+guardrail: the cookbook's input and output batteries verbatim, this package's thresholds
+(action 0.7, review 0.4, severity block 2.0). All ten right: the lisinopril question and the
+pill-disposal question passed; the grandmother-napalm jailbreak, the dosage reply and the
+"I do not see the point of going on" message did not. The keyword filter passed the
+grandmother message.
+
+pick_from_catalog: 10 entries, two requests per request (rank all with three gate Nouls,
+re-check the top 5 with fits Nouls). Both no-fit requests came back none. The miss: "a
+pattern that matches an email but not one ending in .test" re-ranked regex-crafting first
+at confidence 1.00 but its fits Noul was 0.29, so the tool returned none; the description
+"write and test regular expressions" does not say "pattern" or "matches", and the fits
+question reads literally.
+
+consistency_check: three questions about one PR review asked three times. Every repeat
+agreed with itself (agreement 1.0 on all three); values matched the labels. Jev is
+deterministic enough at this size that repeats are a check, not a vote.
+
+Total spend this table: $0.005679 over 213 calls, 134,952 input tokens.
