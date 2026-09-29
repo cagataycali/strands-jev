@@ -12,6 +12,8 @@ case set the baseline aces measures nothing.
 
 ## 2026-09-29, jev-1.13.0
 
+The two sections below were run in two sessions of the same suite on the same day.
+
 | tool | cases | Jev | baseline | calls | input tokens | cost USD | mean ms |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | jev_ask | 8 messages x 3 questions | 7/8 | 5/8 | 8 | 3,519 | 0.000148 | 179 |
@@ -19,6 +21,12 @@ case set the baseline aces measures nothing.
 | route | 14 messages, intent + handler | 14/14 | 11/14 | 14 | 6,886 | 0.000289 | 179 |
 | composite_score | 30 ordered pairs, 6 resumes x 2 profiles | 27/30 | 20/30 | 6 | 3,313 | 0.000139 | 213 |
 | function_call | 16 commands, function + every argument | 14/16 | 10/16 | 16 | 29,830 | 0.001253 | 172 |
+| rerank | 6 queries x 8 passages, top-1 | 6/6 | 0/6 | 48 | 17,746 | 0.000745 | 178 |
+| find_lines | 8 queries over a 21-line contract | 7/8 | 2/8 | 8 | 6,750 | 0.000284 | 158 |
+| extract_value | 8 documents, verbatim pick | 8/8 | 2/8 | 8 | 3,130 | 0.000131 | 162 |
+| extract_date | 8 documents, 7 Choices each | 8/8 | 5/8 | 8 | 13,381 | 0.000562 | 144 |
+| verify_citations | 10 citations over 2 sources | 8/10 | 5/10 | 9 | 4,343 | 0.000182 | 216 |
+| count_matching | 12 log lines | 11/12 | 9/12 | 12 | 3,814 | 0.000160 | 184 |
 
 jev_ask: each message carries a noul (urgency), a choice (billing, technical, sales) and a
 3-level score (frustration); a case counts only when all three match the label. The
@@ -59,4 +67,39 @@ tracking nvidia lately" filled window=3mo where the cookbook leaves it unset ("l
 as stated, 0.5 or over). The keyword baseline had no rule for "swinging", "fell hardest",
 "the s&p by the hour", "what have you got data on" or "side by side".
 
-Total spend this table: $0.002060 over 56 calls, 49,054 input tokens.
+rerank: each of 8 short policy passages has a lexical decoy (a passage that shares its
+words but answers nothing). Six paraphrased queries, one Noul per query and passage pair, 48
+requests. Jev put the right passage first every time; token Jaccard overlap never did, which
+is what the decoys were for.
+
+find_lines: a 21-line contract sent once per query as numbered lines, a Choice over 21 line
+ids plus a presence Noul. Two of the eight queries have no answer in the text. Jev's one
+miss: "In which country's courts would a dispute be heard?" reported not found at presence
+0.29 (the line says "governed by the laws of Ireland"; the question reads through
+"courts", which the jaggedness page calls indirection). The unanswerable "Can I resell the
+service" came back at presence 0.04. The word-overlap baseline needs two shared words to
+claim a hit and found almost nothing in paraphrased questions.
+
+extract_value: regex finders produce the candidate spans (emails, amounts, dates, phones);
+one Choice over them plus none_of_these. Every pick was the right span, verbatim. The
+baseline (first span, or last after "instead"/"rather than"/"moved") got 2.
+
+extract_date: seven Choices per document, assembled in code from today = 2026-09-29 (a
+Tuesday). All eight right, including "next Thursday" (2026-10-08), a bare "Thursday"
+(2026-10-01), "Jan 5" rolling to 2027, and two documents that state no date. The regex
+baseline missed the bare weekday arithmetic, the year rollover and one no-date case.
+
+verify_citations: two present quotes were misread. "Equipment is provided for the home
+office" against the claim "the policy covers laptops and monitors" came back says_nothing
+at 0.58 (a reader would call that supported); "Section 4. Equipment is provided" against
+"remote workers get a stipend" came back contradicts at 0.30 (labelled unsupported). Both
+are under the cookbook's 0.7 floor, so the tool reported them for review rather than as
+decisions. Every contradiction and the missing quote were caught. The baseline calls any
+present quote verified.
+
+count_matching: one Noul per log line, counted in code. The miss: "connection to db-2
+re-established after 4 s" (labelled as something having gone wrong) read as routine at
+INFO level. The grep baseline flagged a DEBUG line about error budget and a release note
+containing the word failure.
+
+Total spend this table: $0.004125 over 149 calls, 98,218 input tokens.

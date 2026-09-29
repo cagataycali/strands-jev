@@ -53,8 +53,14 @@ result = agent.tool.jev_ask(
 | `route` | Intent Choice plus complexity Score; confidence floor, per-intent thresholds, a person as the default handler. |
 | `composite_score` | Atomic Score per dimension, normalised, combined under weight profiles in code; ranks items. |
 | `function_call` | Request to function name plus closed-set arguments with per-argument confidence and a no-match outcome. |
+| `rerank` | One Noul per query and candidate pair, in parallel, best first. Fast search stays yours. |
+| `find_lines` | Which numbered line answers each query, plus whether any line does, in one request per query. |
+| `extract_value` | Pick one of the spans code already found (emails, amounts, dates); the value is a verbatim copy. |
+| `extract_date` | Seven Choices read the shape and parts of a date; code assembles it and reports the weakest confidence. |
+| `verify_citations` | Missing quotes fail by string match; present ones get supports, contradicts or says nothing. |
+| `count_matching` | One Noul per item, the count done in code, because Jev does not count. |
 
-Cookbook tools are next; see `docs/DESIGN.md` for the grid.
+Second shelf of cookbook tools (entity alignment, hierarchical classification, structure recovery, guardrails, catalogue picking, consistency checks) is in progress; see `docs/DESIGN.md`.
 
 ## Measured
 
@@ -67,6 +73,14 @@ From `tests/live/RESULTS.md`, 2026-09-29, jev-1.13.0:
 | `route`, 14 messages | 14/14 | 11/14 (keyword rules) | 179 ms | $0.000289 for 14 calls |
 | `composite_score`, 30 resume pairs | 27/30 | 20/30 (keyword counts) | 213 ms | $0.000139 for 6 calls |
 | `function_call`, 16 commands | 14/16 | 10/16 (keyword dispatch) | 172 ms | $0.001253 for 16 calls |
+| `rerank`, 6 queries x 8 passages | 6/6 | 0/6 (token overlap) | 178 ms | $0.000745 for 48 calls |
+| `find_lines`, 8 queries, 21 lines | 7/8 | 2/8 (word overlap) | 158 ms | $0.000284 for 8 calls |
+| `extract_value`, 8 documents | 8/8 | 2/8 (first span) | 162 ms | $0.000131 for 8 calls |
+| `extract_date`, 8 documents | 8/8 | 5/8 (regex) | 144 ms | $0.000562 for 8 calls |
+| `verify_citations`, 10 citations | 8/10 | 5/10 (string match) | 216 ms | $0.000182 for 9 calls |
+| `count_matching`, 12 log lines | 11/12 | 9/12 (grep) | 184 ms | $0.000160 for 12 calls |
+
+Everything above cost $0.0041 in total, 149 calls.
 
 ## What not to ask
 

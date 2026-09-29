@@ -83,3 +83,7 @@ markers = [
     "live: talks to the real Jev endpoint (needs TYPESAFE_API_KEY or ~/.typesafe); costs money",
     "bedrock: additionally needs AWS credentials for the agent's own model",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# Live test files are mostly case data: long sentences a reader should see whole.
+"tests/live/*" = ["E501"]

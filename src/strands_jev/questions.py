@@ -12,6 +12,8 @@ cookbook used; the docs say to treat them as starting points, not rules.
 
 from __future__ import annotations
 
+from typesafe_sdk import NoulCriteria
+
 # ------------------------------------------------------------------------------ limits
 
 MAX_REQUEST_TOKENS = 64_000
@@ -95,3 +97,70 @@ COMPOSITE_LEVELS = [
 ]
 """Default rubric for composite_score dimensions when the caller gives none. Five levels,
 index 0 first, normalised to 0..1 by dividing by 4 (composite-scoring pattern)."""
+
+# ---------------------------------------------------------------- cookbook questions
+
+RERANK_INSTRUCTIONS = "Does the candidate answer the query, as opposed to being merely on a similar topic?"
+RERANK_CRITERIA: NoulCriteria = {
+    "true": "The candidate states, establishes or directly answers what the query asks for",
+    "false": "The candidate is only on a similar topic, or answers a different question",
+}
+"""cookbooks/rerank_typesafe: one Noul per query and candidate pair, sorted by probability."""
+
+FIND_LINES_WHERE = 'Which line of the document contains the answer to: "{query}"?'
+FIND_LINES_EXISTS = 'Does any line of the document address or answer: "{query}"?'
+FIND_LINES_EXISTS_CRITERIA: NoulCriteria = {
+    "true": "At least one line of the document states or directly implies the answer",
+    "false": "No line of the document addresses this",
+}
+FIND_LINES_MAX_LINES = 255
+"""cookbooks/line_search: Choice over line ids plus a presence Noul in one request. A Choice
+takes at most 255 options, so longer documents are searched in windows."""
+
+EXTRACT_VALUE_NONE = "none_of_these"
+EXTRACT_VALUE_NONE_DESCRIPTION = "None of these is the requested value"
+"""cookbooks/pre_parsed_value_extraction: the options are the candidate spans found in code, so
+the choice is a verbatim copy of one of them; the model chooses, code owns the string."""
+
+DATE_ABSENT = "The document does not state this, or it is not this kind of date."
+DATE_MODE = (
+    "How is {role} written? 'absolute' = a calendar date naming a month (e.g. 'August 14', 'the 3rd of "
+    "March'); 'relative' = given relative to today (today, tomorrow, the day after tomorrow, or a named "
+    "weekday such as 'next Thursday'); 'none' = the document does not state this date."
+)
+DATE_MONTH = "If {role} is an absolute calendar date, which month is it in?"
+DATE_DAY = "If {role} is an absolute calendar date, which day of the month (1-31)?"
+DATE_YEAR = (
+    "If {role} is an absolute calendar date, which year? Pick 'none' if the document states no year "
+    "(code infers it), or 'out_of_range' if a year is stated but not in the list."
+)
+DATE_DAY_ANCHOR = (
+    "If {role} is relative to today, which day is it? 'today', 'tomorrow', 'day_after' (the day after "
+    "tomorrow), or 'weekday' (a named day of the week)."
+)
+DATE_WEEKDAY = "If {role} names a day of the week, which one?"
+DATE_WEEK_OFFSET = (
+    "If {role} names a weekday, which week is it in? 'next' for 'next Thursday' or 'Thursday next week'; "
+    "'current' for 'this Thursday'; 'none' for a bare weekday with no qualifier (just 'Thursday')."
+)
+DATE_YEAR_WINDOW = range(1990, 2041)
+"""cookbooks/date_extraction: seven Choices read the shape and parts of a date; code assembles.
+The cookbook lists 1900 to 2050; 51 years keeps the request smaller and covers what a
+scheduling or invoicing document states. Out-of-range years are flagged, never guessed."""
+
+DATE_CONFIDENCE_FLOOR = 0.6
+"""cookbooks/date_extraction: below the lowest part confidence the date goes to review."""
+
+CITATION_RELATION = "How does the section relate to the claim?"
+CITATION_CRITERIA = {
+    "supports": "The section states the claim or directly implies that it is true",
+    "contradicts": "The section states the opposite of the claim or implies it is false",
+    "says_nothing": "The section does not address what the claim asserts, either way",
+}
+CITATION_VERDICTS = {"supports": "verified", "contradicts": "contradicted", "says_nothing": "unsupported"}
+CITATION_CONFIDENCE_FLOOR = 0.7
+"""cookbooks/citation_check: a quote missing from the source is caught by string match first;
+one Choice reads the quote's context against the claim. The cookbook says start high."""
+
+COUNT_MATCHING = "Does this item satisfy: {condition}?"
+"""model-jaggedness/jev-1.13: the model does not count, so one Noul per item and code counts."""

@@ -34,6 +34,12 @@ agent as intervention handlers. Here the agent is in front: it decides to ask.
 | route | patterns | patterns/intent-routing, patterns/confidence-routing | one tool: intent Choice + complexity Score, per-intent thresholds, `complex_intents` names where the complexity gate applies, `none_of_these` added |
 | composite_score | patterns | patterns/composite-scoring | weight profiles validated in code, raw normalised scores returned, `items` ranks many with one request each |
 | function_call | patterns | cookbooks/function_calling | the spec is the tool input (no signature reflection), `none_of_these` on the function Choice, confidence is the minimum judgement as in the cookbook |
+| rerank | cookbooks | cookbooks/rerank_typesafe | the shortlist is the input; the default question is generic, `instructions` overrides it for a specific relation |
+| find_lines | cookbooks | cookbooks/line_search | windows of 255 lines for longer documents, best window by presence; many queries per call |
+| extract_value | cookbooks | cookbooks/pre_parsed_value_extraction | regex finders for 8 kinds ship with the tool, or the caller passes candidates; one candidate becomes a Noul |
+| extract_date | cookbooks | cookbooks/date_extraction | year window 1990 to 2040 instead of 1900 to 2050; same seven Choices, same assembly rules |
+| verify_citations | cookbooks | cookbooks/citation_check | context window of 600 characters either side of the quote; unknown source is its own verdict |
+| count_matching | cookbooks | model-jaggedness/jev-1.13 (counting) | not a cookbook; the recipe the jaggedness page gives |
 
 ## Folded and rejected
 
@@ -42,6 +48,10 @@ agent as intervention handlers. Here the agent is in front: it decides to ask.
 - `route` gates complexity only on `complex_intents`. Measured 2026-09-29: gating every
   intent escalated two clear lookups because a 3-level Score's confidence sat at 0.42 and
   0.43, under the pattern's 0.5 floor. The pattern itself gates only complaints.
+- The "stated" Noul in `function_call` needs the examples the cookbook puts in it. Measured
+  2026-09-29 on "candles for tesla with volume": "Does the user say how to draw the chart?"
+  answered 0.08 (style dropped); "Does the user say how the chart should be drawn, such as
+  a line, candles or OHLC bars?" answered 0.91. The docstring says so.
 - `function_call` does not read Python signatures the way the cookbook's `closed_sets`
   does. The agent hands over a catalogue; a signature reader is one function on top and
   would tie the tool to Python callables.
