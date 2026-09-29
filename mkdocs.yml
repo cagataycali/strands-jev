@@ -1,0 +1,136 @@
+site_name: Strands Jev
+site_url: https://cagataycali.github.io/strands-jev/
+site_description: Strands Agents tools around Jev, TypeSafe's System One decision model. Typed questions, calibrated answers, one request.
+repo_url: https://github.com/cagataycali/strands-jev
+repo_name: cagataycali/strands-jev
+edit_uri: edit/main/docs/
+strict: true
+docs_dir: docs
+exclude_docs: |
+  hooks/
+  DESIGN.md
+  requirements.txt
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: en
+  font:
+    text: Space Grotesk
+    code: JetBrains Mono
+  logo: assets/img/mark.svg
+  favicon: assets/img/mark.svg
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: paper
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Dark
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Paper
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - navigation.tracking
+    - navigation.instant
+    - navigation.instant.progress
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - search.suggest
+    - search.highlight
+    - toc.follow
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - assets/motion.js
+
+extra:
+  generator: false
+  # The prompt a page with `copy_prompt: true` offers to a coding agent.
+  agent_prompt: >-
+    Walk me through https://cagataycali.github.io/strands-jev/start/ one page at a time. Install
+    strands-jev in a Python 3.12 virtual environment, put my TypeSafe key in ~/.typesafe, run the
+    jev_ask call from the First decision page and explain each answer field, then build the
+    Agent from the First agent page. Stop and ask before any call that spends money.
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/cagataycali/strands-jev
+
+hooks:
+  - docs/hooks/facts.py
+  - docs/hooks/tools_ref.py
+  - docs/hooks/house_style.py
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - toc:
+      title: On this page
+      permalink: true
+      toc_depth: 3
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.keys
+  - pymdownx.snippets:
+      base_path: ["."]
+      check_paths: true
+
+nav:
+  - Home: index.md
+  - Start:
+      - start/index.md
+      - start/install.md
+      - start/first-decision.md
+      - start/first-agent.md
+      - start/cost.md
+  - Learn:
+      - learn/index.md
+      - System One: learn/system-one.md
+      - Primitives: learn/primitives.md
+      - State: learn/state.md
+      - Confidence: learn/confidence.md
+      - Patterns: learn/patterns.md
+      - What not to ask: learn/what-not-to-ask.md
+  - Tools:
+      - tools/index.md
+      - Primitives: tools/primitives.md
+      - Patterns: tools/patterns.md
+      - Cookbooks: tools/cookbooks.md
+  - Measured:
+      - measured/index.md
+      - Method: measured/method.md
+      - Cost: measured/cost.md
+  - Project:
+      - project/index.md
+      - Design: project/design.md
+      - Keys and data: project/keys-and-data.md
+      - Changelog: project/changelog.md
+      - Contributing: project/contributing.md
+      - License: project/license.md
