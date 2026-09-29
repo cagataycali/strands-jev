@@ -2,7 +2,7 @@
 
 Two tokens, each on a line of its own:
 
-* ``{{tools_index}}``: one table over every tool: name, group, first docstring line, the
+* ``{{tools_index}}``: one table per group over every tool: name, first docstring line, the
   live score when ``tests/live`` measured it.
 * ``{{tools_ref:<group>}}``: one section per tool in that group (``primitives``,
   ``patterns``, ``cookbooks``): the description the agent reads, a parameters table taken
@@ -155,10 +155,14 @@ def _live_cell(row: dict[str, Any] | None) -> str:
 
 
 def index_markdown() -> str:
-    lines = ["| tool | group | what it does | Jev vs baseline, mean latency |", "| --- | --- | --- | --- |"]
+    lines: list[str] = []
     for group, entries in catalogue().items():
+        if not entries:
+            continue
+        lines += [f"### {group.capitalize()}", "", "| tool | what it does | Jev vs baseline, mean latency |", "| --- | --- | --- |"]
         for e in entries:
-            lines.append(f"| [`{e['name']}`]({group}.md#{e['name']}) | {group} | {e['summary']} | {_live_cell(e['live'])} |")
+            lines.append(f"| [`{e['name']}`]({group}.md#{e['name']}) | {e['summary']} | {_live_cell(e['live'])} |")
+        lines.append("")
     return "\n".join(lines)
 
 

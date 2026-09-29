@@ -339,3 +339,10 @@
 .sj-bar::after { content: ""; position: absolute; inset: 0; width: var(--p, 0%); background: var(--sj-accent); border-radius: 2px; animation: sj-fill 600ms ease-out both; }
 @keyframes sj-fill { from { width: 0; } }
 .md-typeset .sj-stage__foot { margin: 0.7rem 0 0; font-size: 0.58rem; color: var(--sj-muted); }
+
+/* Tables may run wider than the prose measure; identifier first columns stay on one line so the prose column keeps its width. */
+@media (min-width: 76.25em) {
+  .md-content__inner > .md-typeset__scrollwrap { max-width: 58rem; }
+}
+.md-typeset table:not([class]) td:first-child > :is(code, a):only-child { white-space: nowrap; }
+.md-typeset table:not([class]) td { vertical-align: top; }

@@ -76,6 +76,7 @@
   }
 
   function copied() {
+    document.querySelectorAll(".sj-copy:not([aria-live])").forEach((b) => b.setAttribute("aria-live", "polite"));
     if (document.documentElement.dataset.sjCopy) return;
     document.documentElement.dataset.sjCopy = "1";
     document.addEventListener("click", (e) => {

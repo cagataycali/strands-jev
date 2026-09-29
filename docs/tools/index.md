@@ -4,7 +4,7 @@ description: Every tool in the package, generated from the specs the agent reads
 
 # Tools
 
-{{n:tools}} tools in {{n:groups}} groups. This page and the three behind it are generated at build time from `strands_jev.tools`: the name, the description and the parameter table are the `tool_spec` a Strands `Agent` hands its model, so what you read here is what the model reads. The last column is the live score from [Measured](../measured/index.md), where a tool has one.
+{{n:tools}} tools in {{n:groups}} groups. This page and the three behind it are generated at build time from `strands_jev.tools`: the name, the description and the parameter table are the `tool_spec` a Strands `Agent` hands its model, so what you read here is what the model reads. The last column is the live score from [Measured](../measured/index.md), where a tool has one; `jev_models` and `jev_usage` have nothing to score.
 
 {{tools_index}}
 
